@@ -25,3 +25,9 @@ int main()
     cout << "SAP length is: " << SAPlength << endl;
     return 0;
 }
+
+//left+right+up+down == SAPlength
+//left <= 0,5*SAPlength-1
+//right <= 0,5*SAPlength-1
+//up <= 0,5*SAPlength-1
+//down <= 0,5*SAPlength-1
