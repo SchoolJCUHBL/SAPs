@@ -31,3 +31,4 @@ int main()
 //right <= 0,5*SAPlength-1
 //up <= 0,5*SAPlength-1
 //down <= 0,5*SAPlength-1
+//never the same spot within one walk
