@@ -13,4 +13,4 @@
 *.a
 
 # Executables
-.exe
+*.exe
