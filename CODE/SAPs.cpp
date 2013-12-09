@@ -1,36 +1,9 @@
 //included libraries list
 #include <iostream>
+#include <iomanip>
+#include <vector>
 
-using std::cout;
-using std::cin;
-using std::endl;
-
-#include <CL/cl.hpp>
-#define __NO_STD_VECTOR
-
-/*
-void resetArray (int square, bool grid[][])
-{
-        for (int i = 0; i < square; i++) {
-            for (int j = 0; j < square; j++) {
-               block[i][j] = false;
-            }
-    }
-}
-
-void showArray (bool grid[][], int square)
-{
-    for(int i=0; i<square; i++)    //This loops on the rows.
-	{
-        for(int j=0; j<square; j++) //This loops on the columns
-		{
-			cout << block[i][j]  << "  ";
-		}
-		cout << endl;
-	}
-}
-*/
-
+using namespace std;
 
 //function Main starts the execution
 int main()
@@ -47,12 +20,24 @@ int main()
     }
 
     cout << "SAP length is: " << SAPlength << endl;
-/*
-    bool grid[SAPlength][SAPlength]; //creates a 9*9 matrix or a 2d array.
 
-    resetArray(grid, SAPlength);
-    showArray(grid, SAPlength)
-*/
+  vector<vector<bool> > items;
+  for ( int i = 0; i < SAPlength+1; i++ ) {
+    items.push_back ( vector<bool>() );
+    for ( int j = 0; j < SAPlength+1; j++ )
+      items[i].push_back ( false );
+  }
+
+  items[SAPlength/2][SAPlength/2] = true;
+
+  for ( int i = 0; i < SAPlength+1; i++ ) {
+    for ( int j = 0; j < SAPlength+1; j++ )
+      cout<< setw ( 3 ) << items[i][j] <<' ';
+    cout<<'\n';
+  }
+
+    cout << "Program ended successfully" << endl;
+
     return 0;
 }
 
