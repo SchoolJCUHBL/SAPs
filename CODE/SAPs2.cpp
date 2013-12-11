@@ -42,16 +42,14 @@ int main()
     for(int i = 0;i < starty; ++i){
         grid[i][1] = 2;
     }
+
     for(int i = 0;i < ROWS; ++i){
         grid[i][0] = 2;
-    }
-    for(int i = 0;i < ROWS; ++i){
         grid[i][COLS-1] = 2;
     }
+
     for(int i = 0;i < COLS; ++i){
         grid[0][i] = 2;
-    }
-    for(int i = 0;i < COLS; ++i){
         grid[ROWS-1][i] = 2;
     }
 
@@ -60,17 +58,10 @@ int main()
             printf("%d ", grid[i][j]);
         }
         printf("\n");
-        }
+    }
     printf("\n");
 
     cout << "Program ended successfully" << endl;
 
     return 0;
 }
-
-//left+right+up+down == SAPlength
-//left <= 0,5*SAPlength-1
-//right <= 0,5*SAPlength-1
-//up <= 0,5*SAPlength-1
-//down <= 0,5*SAPlength-1
-//never the same spot within one walk
