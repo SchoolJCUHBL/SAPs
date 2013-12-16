@@ -16,7 +16,7 @@ const int starty = square+1;
 //function Main starts the execution
 int main()
 {
-    array<array<int, COLS>, ROWS> grid;
+    array<array<int, ROWS>, COLS> grid;
 
     int SAPlength = 0;
 
@@ -31,31 +31,31 @@ int main()
 
     cout << "SAP length is: " << SAPlength << endl;
 
-    for(int i = 0;i < ROWS; ++i){
-        for(int j = 0;j < COLS; ++j) {
+    for(int i = 0;i < COLS; ++i){
+        for(int j = 0;j < ROWS; ++j) {
             grid[i][j] = 0;
         }
     }
 
-    grid[starty][startx] = 1;
+    grid[startx][starty] = 1;
 
     for(int i = 0;i < starty; ++i){
-        grid[i][1] = 2;
+        grid[1][i] = 2;
     }
 
     for(int i = 0;i < ROWS; ++i){
-        grid[i][0] = 2;
-        grid[i][COLS-1] = 2;
+        grid[0][i] = 2;
+        grid[COLS-1][i] = 2;
     }
 
     for(int i = 0;i < COLS; ++i){
-        grid[0][i] = 2;
-        grid[ROWS-1][i] = 2;
+        grid[i][0] = 2;
+        grid[i][ROWS-1] = 2;
     }
 
     for(int i = 0;i < ROWS; ++i){
         for(int j = 0;j < COLS; ++j){
-            printf("%d ", grid[i][j]);
+            printf("%d ", grid[j][i]);
         }
         printf("\n");
     }
