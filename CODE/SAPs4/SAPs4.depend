@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1387205244 source:d:\eclipse\saps\code\saps4\main.cpp
+	"main.hpp"
+
+1387202615 d:\eclipse\saps\code\saps4\main.hpp
+	<iostream>
+	<vector>
+

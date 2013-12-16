@@ -40,7 +40,7 @@ int main()
 
     cout << "SAP length is: " << SAPlength << endl;
 
-    int gridlength = ((SAPlength+1)*((SAPlength/2)+2))
+    int gridlength = ((SAPlength+1)*((SAPlength/2)+2));
 
     initVector(gridlength);
 
