@@ -2,6 +2,16 @@
 
 std::vector<bool> grid;
 
+int translateX(int X)
+{
+    return --X;
+}
+
+int translateY(int Y, int height)
+{
+    return Y-(height/2);
+}
+
 int checkInput()
 {
     int n = 0;
@@ -18,20 +28,36 @@ int checkInput()
 
 void initVector(int gridsize)
 {
-    for (int i = 0; i < (gridsize - 1); i++)
+    for (int i = 0; i < (gridsize); i++)
     {
         grid.push_back (false);
     }
 }
 
-int translateY()
+void printVector(int gridsize, int width, int height)
 {
-
+    int j = height;
+    cout << endl;
+    for (int i = 0; i < (gridsize) ;i++ )
+    {
+        if (i%width == 0)
+        {
+            cout << endl << translateY(--j, height) << "\t";
+        }
+        cout << grid.at(i) << " ";
+    }
+    cout << endl << "       ";
+    for (int i = 0; i < (width) ;i++ )
+    {
+        cout << translateX(i) << " ";
+    }
+    cout << endl;
 }
 
-int translateX()
+void delVector()
 {
-
+    grid.clear();
+    grid.shrink_to_fit();
 }
 
 int main()
@@ -40,10 +66,16 @@ int main()
 
     cout << "SAP length is: " << SAPlength << endl;
 
-    int gridlength = ((SAPlength+1)*((SAPlength/2)+2));
+    int width = (SAPlength/2)+2;
+    int height = SAPlength+1;
+    int gridlength = height*width;
 
     initVector(gridlength);
 
+    #ifdef _DEBUG  //( or #ifndef _NDEBUG )
+        printVector(gridlength, width, height);
+    #endif
 
+    delVector();
     return 0;
 }
