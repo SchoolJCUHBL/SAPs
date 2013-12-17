@@ -2,14 +2,24 @@
 
 std::vector<bool> grid;
 
-int translateX(int X)
+int translateXtoMan(int X)
 {
     return --X;
 }
 
-int translateY(int Y, int height)
+int translateXtoMachine(int X)
+{
+    return ++X;
+}
+
+int translateYtoMan(int Y, int height)
 {
     return Y-(height/2);
+}
+
+int translateYtoMachine(int Y, int height)
+{
+    return Y+(height/2);
 }
 
 int checkInput()
@@ -34,6 +44,24 @@ void initVector(int gridsize)
     }
 }
 
+void initForbidden(int SAPlength, int height, int width)
+{
+    for (int i = 0, i < width, i++)
+    {
+        grid.at(i * height) = true;
+        grid.at(height - 1 + i * heigth) = true;
+    }
+    for (int i = 0, i < height, i++)
+    {
+        grid.at(i) = true;
+        grid.at(0,5 * SAPlength * height - i) = true;
+    }
+    for (int i = 0, i < SAPlength - 1, i++)
+    {
+        grid.at(2 * height - 1 - i) = true;
+    }
+}
+
 void printVector(int gridsize, int width, int height)
 {
     int j = height;
@@ -42,14 +70,14 @@ void printVector(int gridsize, int width, int height)
     {
         if (i%width == 0)
         {
-            cout << endl << translateY(--j, height) << "\t";
+            cout << endl << translateYtoMan(--j, height) << "\t";
         }
         cout << grid.at(i) << " ";
     }
     cout << endl << "       ";
     for (int i = 0; i < (width) ;i++ )
     {
-        cout << translateX(i) << " ";
+        cout << translateXtoMan(i) << " ";
     }
     cout << endl;
 }
@@ -71,6 +99,7 @@ int main()
     int gridlength = height*width;
 
     initVector(gridlength);
+    initForbidden(SAPlength, height, width);
 
     #ifdef _DEBUG  //( or #ifndef _NDEBUG )
         printVector(gridlength, width, height);
