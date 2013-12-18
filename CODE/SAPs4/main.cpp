@@ -46,17 +46,17 @@ void initVector(int gridsize)
 
 void initForbidden(int SAPlength, int height, int width)
 {
-    for (int i = 0, i < width, i++)
+    for (int i = 0; i < width; i++)
     {
         grid.at(i * height) = true;
-        grid.at(height - 1 + i * heigth) = true;
+        grid.at(height - 1 + i * height) = true;
     }
-    for (int i = 0, i < height, i++)
+    for (int i = 0; i < height; i++)
     {
         grid.at(i) = true;
-        grid.at(0,5 * SAPlength * height - i) = true;
+        grid.at((0.5 * SAPlength * height - i)) = true;
     }
-    for (int i = 0, i < SAPlength - 1, i++)
+    for (int i = 0; i < SAPlength - 1; i++)
     {
         grid.at(2 * height - 1 - i) = true;
     }
@@ -101,9 +101,7 @@ int main()
     initVector(gridlength);
     initForbidden(SAPlength, height, width);
 
-    #ifdef _DEBUG  //( or #ifndef _NDEBUG )
-        printVector(gridlength, width, height);
-    #endif
+    printVector(gridlength, width, height);
 
     delVector();
     return 0;
