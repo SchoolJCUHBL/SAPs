@@ -14,7 +14,7 @@ int translateXtoMachine(int X)
 
 int translateYtoMan(int Y, int height)
 {
-    return Y-(height/2);
+    return Y-(height/2)-1;
 }
 
 int translateYtoMachine(int Y, int height)
@@ -44,21 +44,21 @@ void initVector(int gridsize)
     }
 }
 
-void initForbidden(int SAPlength, int height, int width)
+void initForbidden(int gridsize, int height, int width)
 {
     for (int i = 0; i < width; i++)
     {
-        grid.at(i * height) = true;
-        grid.at(height - 1 + i * height) = true;
+        grid.at(i) = true;
+        grid.at(gridsize - width + i) = true;
     }
     for (int i = 0; i < height; i++)
     {
-        grid.at(i) = true;
-        grid.at((0.5 * SAPlength * height - i)) = true;
+        grid.at(width * i) = true;
+        grid.at(width * i + (width - 1)) = true;
     }
-    for (int i = 0; i < SAPlength - 1; i++)
+    for (int i = 0; i < height/2; i++)
     {
-        grid.at(2 * height - 1 - i) = true;
+        grid.at(width * i + 1) = true;
     }
 }
 
@@ -70,14 +70,24 @@ void printVector(int gridsize, int width, int height)
     {
         if (i%width == 0)
         {
-            cout << endl << translateYtoMan(--j, height) << "\t";
+            cout << endl << setw(3) << --j << " | " << setw(3) << translateYtoMan(j, height) << "\t";
         }
         cout << grid.at(i) << " ";
     }
-    cout << endl << "       ";
+    cout << endl << endl << "\t       ";
     for (int i = 0; i < (width) ;i++ )
     {
         cout << translateXtoMan(i) << " ";
+    }
+    cout << endl << "\t\t";
+    for (int i = 0; i < (width) ;i++ )
+    {
+        cout << "--";
+    }
+    cout << endl << "\t\t";
+    for (int i = 0; i < (width) ;i++ )
+    {
+        cout << i << " ";
     }
     cout << endl;
 }
@@ -99,7 +109,7 @@ int main()
     int gridlength = height*width;
 
     initVector(gridlength);
-    initForbidden(SAPlength, height, width);
+    initForbidden(gridlength, height, width);
 
     printVector(gridlength, width, height);
 
