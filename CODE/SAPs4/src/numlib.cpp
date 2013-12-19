@@ -1,8 +1,5 @@
 //included libs
-#include <iostream>
-#include <vector>
-
-using namespace std;
+#include "numlib.h"
 
 //function main starts the execution
 
@@ -16,7 +13,7 @@ void printCount (vector<unsigned short> &number) //print number
 	cout << endl;
 }
 
-void correct (vector<unsigned short> &number, int position = 0, int system = 10) //correct function
+void correct (vector<unsigned short> &number, int position, int system) //correct function
 {
 	while (number.at(position) > system-1)
 	{
@@ -33,23 +30,8 @@ void correct (vector<unsigned short> &number, int position = 0, int system = 10)
 	}
 }
 
-void add (vector<unsigned short> &number, int addition = 1)
+void add (vector<unsigned short> &number, int addition)
 {
 	number.at(0) += addition;
 	correct(number);
-}
-
-
-int main()
-{
-    vector<unsigned short> number (1);
-
-    for (int i = 0; i < 100000; i++)
-    {
-        add(number, 91);
-        printCount(number);
-    }
-
-
-	return 0;
 }
