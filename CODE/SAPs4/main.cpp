@@ -2,8 +2,6 @@
 #include "numlib.h"
 #include "CoordinatesConvert.h"
 
-std::vector<bool> grid;
-
 int checkInput()
 {
     int n = 0;
@@ -18,7 +16,7 @@ int checkInput()
     return n;
 }
 
-void initVector(int gridsize)
+void initVector(vector<bool> &grid, int gridsize)
 {
     for (int i = 0; i < (gridsize); i++)
     {
@@ -26,7 +24,7 @@ void initVector(int gridsize)
     }
 }
 
-void initForbidden(int gridsize, int height, int width)
+void initForbidden(vector<bool> &grid, int gridsize, int height, int width)
 {
     for (int i = 0; i < width; i++)
     {
@@ -44,7 +42,7 @@ void initForbidden(int gridsize, int height, int width)
     }
 }
 
-void printVector(int gridsize, int width, int height)
+void printVector(vector<bool> &grid, int gridsize, int width, int height)
 {
     int j = height;
     cout << endl;
@@ -74,14 +72,20 @@ void printVector(int gridsize, int width, int height)
     cout << endl;
 }
 
-void delVector()
+void delVector(vector<bool> &grid)
 {
     grid.clear();
     grid.shrink_to_fit();
 }
 
+void takeStep(vector<bool> &grid, int X, int Y, int rest)
+{
+
+}
+
 int main()
 {
+    vector<bool> grid;
     int SAPlength = checkInput();
 
     cout << "SAP length is: " << SAPlength << endl;
@@ -90,11 +94,11 @@ int main()
     int height = SAPlength+1;
     int gridlength = height*width;
 
-    initVector(gridlength);
-    initForbidden(gridlength, height, width);
+    initVector(grid, gridlength);
+    initForbidden(grid, gridlength, height, width);
 
-    printVector(gridlength, width, height);
+    printVector(grid, gridlength, width, height);
 
-    delVector();
+    delVector(grid);
     return 0;
 }
