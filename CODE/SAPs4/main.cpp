@@ -41,7 +41,7 @@ void initForbidden(vector<bool> &grid, int gridsize, int height, int width)
         grid.at(width * i + 1) = true;
     }
 }
-
+/*
 void printVector(vector<bool> &grid, int gridsize, int width, int height)
 {
     int j = height;
@@ -71,7 +71,7 @@ void printVector(vector<bool> &grid, int gridsize, int width, int height)
     }
     cout << endl;
 }
-
+*/
 void delVector(vector<bool> &grid, vector<unsigned short> &number)
 {
     grid.clear();
@@ -110,8 +110,8 @@ int main()
 {
     vector<bool> grid;
     vector<unsigned short> number (1, 0);
-    int SAPlength = checkInput();
 
+    int SAPlength = checkInput();
     cout << "SAP length is: " << SAPlength << endl;
 
     int width = (SAPlength/2)+2;
