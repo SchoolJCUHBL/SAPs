@@ -72,20 +72,44 @@ void printVector(vector<bool> &grid, int gridsize, int width, int height)
     cout << endl;
 }
 
-void delVector(vector<bool> &grid)
+void delVector(vector<bool> &grid, vector<unsigned short> &number)
 {
     grid.clear();
     grid.shrink_to_fit();
+    number.clear();
+    number.shrink_to_fit();
 }
 
-void takeStep(vector<bool> &grid, int X, int Y, int rest)
+void takeStep(vector<bool> &grid, vector<unsigned short> &number, int width, int height, int rest, int pos, int Y)
 {
-
+    if (grid.at(pos) == false)
+    {
+        grid.at(pos) = true;
+        div_t xyresult = div(pos, width);
+        int DeltaPos = abs(xyresult.quot-Y) + abs(xyresult.rem-1);
+        if (DeltaPos <= rest)
+        {
+            if (rest == 1 && rest == DeltaPos)
+            {
+                add(number);
+            }
+            else
+            {
+                signed int directions[] = {1,width,-1,-width};
+                for (int &i: directions)
+                {
+                    takeStep(grid, number, width, height, rest-1, pos+i, Y);
+                }
+            }
+        }
+        grid.at(pos) = false;
+    }
 }
 
 int main()
 {
     vector<bool> grid;
+    vector<unsigned short> number (1, 0);
     int SAPlength = checkInput();
 
     cout << "SAP length is: " << SAPlength << endl;
@@ -97,8 +121,15 @@ int main()
     initVector(grid, gridlength);
     initForbidden(grid, gridlength, height, width);
 
-    printVector(grid, gridlength, width, height);
+    int Y = translateYtoMachine(0, height);
+    int startpos = Y * width + 1;
+    grid.at(startpos) = true;
 
-    delVector(grid);
+    takeStep(grid, number, width, height, SAPlength-1, startpos+1, Y);
+
+    //printVector(grid, gridlength, width, height);
+    printCount(number);
+
+    delVector(grid, number);
     return 0;
 }
