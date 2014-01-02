@@ -22,8 +22,13 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="opencl_x64" />
+				<Option projectIncludeDirsRelation="2" />
 				<Compiler>
-					<Add option="-O2" />
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-O3" />
+					<Add option="-Wunreachable-code" />
+					<Add option="-std=c++11" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -33,6 +38,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add option="-m64" />
 		</Compiler>
 		<Unit filename="include/CoordinatesConvert.h" />
 		<Unit filename="include/numlib.h" />
