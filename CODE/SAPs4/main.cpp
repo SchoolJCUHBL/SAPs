@@ -1,3 +1,4 @@
+#include "version.h"
 #include "main.hpp"
 #include "numlib.h"
 #include "CoordinatesConvert.h"
@@ -72,15 +73,8 @@ void printVector(vector<bool> &grid, int gridsize, int width, int height)
     cout << endl;
 }
 */
-void delVector(vector<bool> &grid, vector<unsigned short> &number)
-{
-    grid.clear();
-    grid.shrink_to_fit();
-    number.clear();
-    number.shrink_to_fit();
-}
 
-void takeStep(vector<bool> &grid, vector<unsigned short> &number, int width, int height, int rest, int pos, int Y)
+void takeStep(vector<bool> &grid, vector<unsigned short> &number, int width, int height, int rest, int pos, int Y, bool firstit)
 {
     if (grid.at(pos) == false)
     {
@@ -96,9 +90,41 @@ void takeStep(vector<bool> &grid, vector<unsigned short> &number, int width, int
             else
             {
                 signed int directions[] = {1,width,-1,-width};
-                for (int &i: directions)
+
+                if (firstit)
                 {
-                    takeStep(grid, number, width, height, rest-1, pos+i, Y);
+                    //kloon de vector 3x zodat er 4 vectoren zijn. 1 zal al snel klaar zijn
+                    cout << "Initializing Worker Resouces" << endl;
+
+                    vector<vector<bool>> threadedgrids (4, grid);
+                    vector<vector<unsigned short>> counters (4, number);
+                    vector<thread> threads;
+
+                    cout << "Done" << endl << endl << "Starting Workers" << endl;
+
+                    for (int i = 0; i < 4; i++)
+                    {
+                        threads.emplace_back(thread(takeStep, ref(threadedgrids.at(i)), ref(counters.at(i)), width, height, rest-1, pos+directions[i], Y, 0));
+                    }
+                    cout << "Workers Started" << endl << endl;
+
+                    for(auto& thread : threads)
+                    {
+                        cout << "Worker Finished" << endl;
+
+                        thread.join();
+                    }
+                    cout << endl << "All Workers Finished!" << endl << endl;
+                    cout << "Calculating result" << endl << endl;
+
+                    finalize(number, counters);
+                }
+                else
+                {
+                    for (int &i: directions)
+                    {
+                        takeStep(grid, number, width, height, rest-1, pos+i, Y);
+                    }
                 }
             }
         }
@@ -108,28 +134,27 @@ void takeStep(vector<bool> &grid, vector<unsigned short> &number, int width, int
 
 int main()
 {
-    vector<bool> grid;
+    vector<bool> grid0;
     vector<unsigned short> number (1, 0);
 
     int SAPlength = checkInput();
-    cout << "SAP length is: " << SAPlength << endl;
+    cout << "SAP length is: " << SAPlength << endl << endl;
 
     int width = (SAPlength/2)+2;
     int height = SAPlength+1;
     int gridlength = height*width;
 
-    initVector(grid, gridlength);
-    initForbidden(grid, gridlength, height, width);
+    initVector(grid0, gridlength);
+    initForbidden(grid0, gridlength, height, width);
 
     int Y = translateYtoMachine(0, height);
     int startpos = Y * width + 1;
-    grid.at(startpos) = true;
+    grid0.at(startpos) = true;
 
-    takeStep(grid, number, width, height, SAPlength-1, startpos+1, Y);
+    takeStep(grid0, number, width, height, SAPlength-1, startpos+1, Y, true);
 
-    //printVector(grid, gridlength, width, height);
+    //printVector(grid0, gridlength, width, height);
     printCount(number);
 
-    delVector(grid, number);
     return 0;
 }
