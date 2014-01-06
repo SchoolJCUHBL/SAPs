@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1388875794 source:d:\eclipse\saps\tests\opencl\cltest\main.cpp
+	<iostream>
+	<vector>
+	<string>
+	<fstream>
+	"OpenCL/opencl.h"
+	"CL/cl.h"
+

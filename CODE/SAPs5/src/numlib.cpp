@@ -22,7 +22,7 @@ void correct (vector<unsigned short> &number, int position, int system) //correc
 	while (number.at(position) > system-1)
 	{
 		number.at(position) -= system;
-		if (position != static_cast<int>(number.size())-1)
+		if (position != number.size()-1)
 		{
 			number.at(position+1)++;
 		}
@@ -42,36 +42,32 @@ void add (vector<unsigned short> &number, int addition)
 
 void finalize (vector<unsigned short> &number, vector<vector<unsigned short>> &counters)
 {
-    long long unsigned int array[] = {(counters.at(0).size()),(counters.at(1).size()),(counters.at(2).size()),(counters.at(3).size())};
-    long long unsigned int temp = 0;
+    int array[] = {counters.at(0).size(),counters.at(1).size(),counters.at(2).size(),counters.at(3).size()};
+    int temp = 0;
 
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < 4; i++) //checks for longest vector, which will determine the length of the outputvector
     {
         if(array[i]>temp)
         temp=array[i];
     }
 
-    long long unsigned int numsize = number.size();
+    int numsize = number.size();
 
-    for (unsigned int i = 0; i <= ((temp-numsize));i++)
+    for (int i = 0; i<= (temp-numsize);i++) //adds enough spaces in the vector to contain the output
     {
         number.emplace_back(0);
     }
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++) //adds all counters together in one output
     {
-        for ( unsigned int j = 0; j < counters.at(i).size(); j++)
+        for (int j = 0; j < array[i]; j++)
         {
             number.at(j) += counters.at(i).at(j);
         }
     }
 
-    for (unsigned int i = 0; i < number.size(); i++)
+    for (int i = 0; i < number.size(); i++) //asks the correction of the output
     {
-        while (number.at(i) > 9)
-        {
-            number.at(i) -= 10;
-            number.at(i+1)++;
-        }
+        correct(number, i);
     }
 }

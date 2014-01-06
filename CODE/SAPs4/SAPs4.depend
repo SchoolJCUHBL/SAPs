@@ -1,26 +1,23 @@
 # depslib dependency file v1.0
-1388767264 source:d:\eclipse\saps\code\saps4\main.cpp
+1388768060 source:d:\eclipse\saps\code\saps4\main.cpp
 	"version.h"
 	"main.hpp"
 	"numlib.h"
 	"CoordinatesConvert.h"
 
-1388703465 d:\eclipse\saps\code\saps4\main.hpp
+1388787491 d:\eclipse\saps\code\saps4\main.hpp
 	<iostream>
 	<iomanip>
 	<vector>
 	<cmath>
-	<stdlib.h>
 	<thread>
-	<mutex>
 
-1388761087 d:\eclipse\saps\code\saps4\include\numlib.h
+1388787530 d:\eclipse\saps\code\saps4\include\numlib.h
 	<iostream>
 	<vector>
 	<string>
-	<mutex>
 
-1388766266 source:d:\eclipse\saps\code\saps4\src\numlib.cpp
+1388841227 source:d:\eclipse\saps\code\saps4\src\numlib.cpp
 	"numlib.h"
 
 1387461788 d:\eclipse\saps\code\saps4\include\coordinatesconvert.h
@@ -28,5 +25,5 @@
 1387461763 source:d:\eclipse\saps\code\saps4\src\coordinatesconvert.cpp
 	"CoordinatesConvert.h"
 
-1388767281 d:\eclipse\saps\code\saps4\version.h
+1388787491 d:\eclipse\saps\code\saps4\version.h
 

@@ -1,0 +1,31 @@
+# depslib dependency file v1.0
+1387461763 source:d:\eclipse\saps\code\saps5\src\coordinatesconvert.cpp
+	"CoordinatesConvert.h"
+
+1387461788 d:\eclipse\saps\code\saps5\include\coordinatesconvert.h
+
+1388935705 source:d:\eclipse\saps\code\saps5\src\numlib.cpp
+	"numlib.h"
+
+1388787530 d:\eclipse\saps\code\saps5\include\numlib.h
+	<iostream>
+	<vector>
+	<string>
+
+1388937688 source:d:\eclipse\saps\code\saps5\main.cpp
+	"version.h"
+	"main.hpp"
+	"numlib.h"
+	"CoordinatesConvert.h"
+
+1388937688 d:\eclipse\saps\code\saps5\version.h
+
+1388936392 d:\eclipse\saps\code\saps5\main.hpp
+	<iostream>
+	<iomanip>
+	<vector>
+	<cmath>
+	<thread>
+	<exception>
+	<stdexcept>
+
