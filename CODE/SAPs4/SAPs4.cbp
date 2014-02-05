@@ -36,10 +36,11 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-static" />
+					<Add option="-m64" />
 					<Add option="-static-libgcc" />
 					<Add option="-static-libstdc++" />
-					<Add option="-lpthread" />
+					<Add option="-static" />
+					<Add option="-pthread" />
 				</Linker>
 			</Target>
 		</Build>

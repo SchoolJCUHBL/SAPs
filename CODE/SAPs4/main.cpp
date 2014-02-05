@@ -1,6 +1,5 @@
 #include "version.h"
 #include "main.hpp"
-#include "numlib.h"
 #include "CoordinatesConvert.h"
 
 int checkInput()
@@ -45,13 +44,13 @@ void initForbidden(vector<bool> &grid, int gridsize, int height, int width)
 /*
 void printVector(vector<bool> &grid, int gridsize, int width, int height)
 {
-    int j = height;
+    int j = 0;
     cout << endl;
     for (int i = 0; i < (gridsize) ;i++ )
     {
         if (i%width == 0)
         {
-            cout << endl << setw(3) << --j << " | " << setw(3) << translateYtoMan(j, height) << "\t";
+            cout << endl << setw(3) << j++ << " | " << setw(3) << translateYtoMan(j, height) << "\t";
         }
         cout << grid.at(i) << " ";
     }
@@ -73,82 +72,140 @@ void printVector(vector<bool> &grid, int gridsize, int width, int height)
     cout << endl;
 }
 */
-
-void takeStep(vector<bool> &grid, vector<unsigned short> &number, int width, int height, int rest, int pos, int Y, long deptht)
+void ConvertStep(vector<bool> grid, int256_t &number, int width, int height, int rest, int pos, int Y)
 {
-    if (grid.at(pos) == false)
+    takeStep(grid, number, width, height, rest, pos, Y);
+}
+
+void takeFirstStep(vector<bool> &grid,int256_t &number, int width, int height, int rest, int pos, int Y)
+{
+    if (!grid.at(pos))
+    {
+        grid.at(pos) = true;
+        //kloon de vector 3x zodat er 4 vectoren zijn. 1 zal al snel klaar zijn
+
+        vector<int256_t> counters (8, 0);
+        vector<thread> threads;
+
+        signed int directions[] = {1,width,-1,-width};
+
+        int indexer = 0;
+
+        for (int i = 0; i < 4; i++ )
+        {
+            int temppos = pos;
+            temppos += directions[i];
+            if (!grid.at(temppos))
+            {
+                grid.at(temppos) = true;
+                for (int j = 0; j < 4; j++)
+                {
+                    int temppos2 = temppos;
+                    temppos2 += directions[j];
+                    if (!grid.at(temppos2) && temppos2 != (Y*width + 1 + width))
+                    {
+                        threads.emplace_back(thread(ConvertStep, grid, ref(counters.at(indexer)), width, height, rest-2, temppos2, Y));
+                        indexer++;
+                    }
+                }
+                grid.at(temppos) = false;
+            }
+        }
+
+        for(auto& thread : threads)
+        {
+            thread.join();
+        }
+
+        for (int i = 0; i < 8; i++)
+        {
+            number = number + counters.at(i);
+        }
+        grid.at(pos) = false;
+    }
+
+}
+
+void takeStep(vector<bool> &grid, int256_t &number, int width, int height, int rest, int pos, int Y)
+{
+    if (!grid.at(pos))
     {
         grid.at(pos) = true;
         div_t xyresult = div(pos, width);
         int DeltaPos = abs(xyresult.quot-Y) + abs(xyresult.rem-1);
         if (DeltaPos <= rest)
         {
-            if (rest == 1 && rest == DeltaPos)
+            if (DeltaPos == 1)
             {
-                add(number);
+                if (rest == 1)
+                {
+                    number = number + 1;
+                }
             }
             else
             {
                 signed int directions[] = {1,width,-1,-width};
 
-                if (deptht == 0 || deptht == 1)
+                for (int &i: directions)
                 {
-                    //kloon de vector 3x zodat er 4 vectoren zijn. 1 zal al snel klaar zijn
-
-                    vector<vector<bool>> threadedgrids (4, grid);
-                    vector<vector<unsigned short>> counters (4, number);
-                    vector<thread> threads;
-
-                    for (int i = 0; i < 4; i++)
-                    {
-                        threads.emplace_back(thread(takeStep, ref(threadedgrids.at(i)), ref(counters.at(i)), width, height, rest-1, pos+directions[i], Y, deptht+1));
-                    }
-
-                    for(auto& thread : threads)
-                    {
-
-                        thread.join();
-                    }
-
-                    finalize(number, counters);
+                    takeStep(grid, number, width, height, rest-1, pos+i, Y);
                 }
-                else
-                {
-                    for (int &i: directions)
-                    {
-                        takeStep(grid, number, width, height, rest-1, pos+i, Y, deptht+1);
-                    }
-                }
-
             }
+
         }
         grid.at(pos) = false;
     }
 }
 
-int main()
+int main(int argc,char *argv[])
 {
-    vector<bool> grid0;
-    vector<unsigned short> number (1, 0);
+    ofstream outputFile;
+    outputFile.open("SAPsLog.txt", ios::out | ios::app);
 
-    int SAPlength = checkInput();
-    cout << "SAP length is: " << SAPlength << endl << endl;
+    int SAPlength = 0;
 
-    int width = (SAPlength/2)+2;
-    int height = SAPlength+1;
-    int gridlength = height*width;
+    if (outputFile.is_open())
+    {
+        if (argc <= 1)
+        {
+            SAPlength = checkInput();
+            cout << "SAP length is: " << SAPlength << endl << endl;
+        }
+        else
+        {
+            istringstream ss(argv[1]);
+            int x;
+            if (!(ss >> x))
+            {
+                SAPlength = checkInput();
+                cout << "SAP length is: " << SAPlength << endl << endl;
+            }
+            else
+            {
+                SAPlength = x;
+            }
+        }
 
-    initVector(grid0, gridlength);
-    initForbidden(grid0, gridlength, height, width);
+        vector<bool> grid;
 
-    int Y = translateYtoMachine(0, height);
-    int startpos = Y * width + 1;
-    grid0.at(startpos) = true;
+        int256_t number = 0;
 
-    takeStep(grid0, number, width, height, SAPlength-1, startpos+1, Y);
+        int width = (SAPlength/2)+2;
+        int height = SAPlength+1;
+        int gridlength = height*width;
 
-    //printVector(grid0, gridlength, width, height);
-    printCount(number);
+        initVector(grid, gridlength);
+        initForbidden(grid, gridlength, height, width);
 
+        int Y = translateYtoMachine(0, height);
+        int startpos = Y * width + 1;
+        grid.at(startpos) = true;
+
+        takeFirstStep(grid, number, width, height, SAPlength-1, startpos+1, Y);
+
+        //printVector(grid, gridlength, width, height);
+        outputFile << "result L" << SAPlength << ": " << number << ";" << endl;
+    }
+    outputFile.close();
     return 0;
 }

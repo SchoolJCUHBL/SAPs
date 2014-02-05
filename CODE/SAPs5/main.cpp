@@ -74,8 +74,9 @@ void printVector(vector<bool> &grid, int gridsize, int width, int height) //prin
 }
 */
 
-void takeStep(vector<bool> &grid, vector<unsigned short> &number, int width, int height, int rest, int pos, int Y, int depth)
+vector<unsigned short> takeStep(vector<bool> grid, int width, int height, int rest, int pos, int Y, int depth)
 {
+    vector<unsigned short> number (1, 0);
     if (grid.at(pos) == false) //only if the point that has just been entered is legal (false) will the code continue. if the point is true, the function will do nothing.
     {
         grid.at(pos) = true;
@@ -89,63 +90,80 @@ void takeStep(vector<bool> &grid, vector<unsigned short> &number, int width, int
             }
             else
             {
-                signed int directions[] = {1,width,-1,-width}; //makes an array with four values, representing the values that need to be added to pos to go up, right, down, left.
+                signed int directions[4] = {1,width,-1,-width}; //makes an array with four values, representing the values that need to be added to pos to go up, right, down, left.
 
-                if (depth == 0 || depth == 1 || depth == 2 || depth == 3/* || depth == 4 || depth == 5*/) //The depths on which the program will spawn threads
+                vector<future<vector<unsigned short>>> futures;
+
+                for (int i = 0; i < 4; i++)
                 {
-                    //kloon de vector 4x zodat er 4 vectoren zijn. 1 zal al snel klaar zijn
-                    vector<vector<bool>> threadedgrids (4, grid);
-                    vector<vector<unsigned short>> counters (4, vector<unsigned short> (1, 0));
-                    vector<thread> threads;
-
-                    for (int i = 0; i < 4; i++)
-                    {
-                        threads.emplace_back(thread(takeStep, ref(threadedgrids.at(i)), ref(counters.at(i)), width, height, rest-1, pos+directions[i], Y, depth+1)); //make new threads, each executing takestep
-                    }
-
-                    for(auto& thread : threads)
-                    {
-                        thread.join(); //wait for each thread to finish
-                    }
-
-                    finalize(number, counters); //calculate total number of SAP's found by the worker threads
+                    futures.push_back(async(launch::async, takeStep, grid, width, height, rest-1, pos+directions[i], Y, depth+1)); //make new threads, each executing takestep
                 }
-                else
-                {
-                    for (int &i: directions)
-                    {
-                        takeStep(grid, number, width, height, rest-1, pos+i, Y, depth+1); //this is a recursive function, with each iteration starting four more, each going in a new direction and being one shorter
-                    }
+
+                vector<vector<unsigned short>> counters;
+
+                for(auto &e : futures) {
+                    counters.push_back(e.get());
                 }
+                finalize(number, counters); //calculate total number of SAP's found by the worker threads
             }
         }
         grid.at(pos) = false;
     }
+    return number;
 }
 
-int main()
+int main(int argc,char *argv[])
 {
-    vector<bool> grid0;
-    vector<unsigned short> number (1, 0);
+    ofstream outputFile;
+    outputFile.open("SAPsLog.txt", ios::out | ios::app);
 
-    int SAPlength = checkInput();
-    cout << "SAP length is: " << SAPlength << endl << endl;
+    int SAPlength = 0;
 
-    int width = (SAPlength/2)+2; //the size of the grid depends on the SAP-length
-    int height = SAPlength+1;
-    int gridlength = height*width; //the vector is 1D, but interpreted as 2D
+    if (outputFile.is_open())
+    {
+        if (argc <= 1)
+        {
+            SAPlength = checkInput();
+            cout << "SAP length is: " << SAPlength << endl << endl;
+        }
+        else
+        {
+            istringstream ss(argv[1]);
+            int x;
+            if (!(ss >> x))
+            {
+                SAPlength = checkInput();
+                cout << "SAP length is: " << SAPlength << endl << endl;
+            }
+            else
+            {
+                SAPlength = x;
+            }
+        }
 
-    initVector(grid0, gridlength);
-    initForbidden(grid0, gridlength, height, width);
+        outputFile << "start IT" << endl;
+        vector<bool> grid0;
 
-    int Y = translateYtoMachine(0, height);
-    int startpos = Y * width + 1;
-    grid0.at(startpos) = true;
+        int width = (SAPlength/2)+2; //the size of the grid depends on the SAP-length
+        int height = SAPlength+1;
+        int gridlength = height*width; //the vector is 1D, but interpreted as 2D
 
-    takeStep(grid0, number, width, height, SAPlength-1, startpos+1, Y); //take the first step
+        initVector(grid0, gridlength);
+        initForbidden(grid0, gridlength, height, width);
 
-    //printVector(grid0, gridlength, width, height);
-    printCount(number);
+        int Y = translateYtoMachine(0, height);
+        int startpos = Y * width + 1;
+        grid0.at(startpos) = true;
 
+        //cout << "start" << endl;
+
+        vector<unsigned short> number = takeStep(grid0, width, height, SAPlength-1, startpos+1, Y); //take the first step
+
+        //printVector(grid0, gridlength, width, height);
+        outputFile << "result: ";
+        outputFile << printCount(number) <<" " << endl;
+    }
+    outputFile << endl;
+    outputFile.close();
     return 0;
 }

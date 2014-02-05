@@ -1,7 +1,7 @@
 //included libs
 #include "numlib.h"
 
-void printCount (vector<unsigned short> &number) //print number
+string printCount (vector<unsigned short> &number) //print number
 {
 	string output;
 	for (int i = number.size()-1; i >= 0; i--)
@@ -14,7 +14,8 @@ void printCount (vector<unsigned short> &number) //print number
         output.erase(0,pos);
     }
 
-	cout << output << endl;
+	//cout << output << endl;
+	return output;
 }
 
 void correct (vector<unsigned short> &number, int position, int system) //correct function
@@ -42,10 +43,10 @@ void add (vector<unsigned short> &number, int addition)
 
 void finalize (vector<unsigned short> &number, vector<vector<unsigned short>> &counters)
 {
-    long long unsigned int array[] = {(counters.at(0).size()),(counters.at(1).size()),(counters.at(2).size()),(counters.at(3).size())};
+    long long unsigned int array[] = {counters.at(0).size(),counters.at(1).size(),counters.at(2).size(),counters.at(3).size(),counters.at(4).size(),counters.at(5).size(),counters.at(6).size(),counters.at(7).size()};
     long long unsigned int temp = 0;
 
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < 8; i++)
     {
         if(array[i]>temp)
         temp=array[i];
@@ -53,14 +54,14 @@ void finalize (vector<unsigned short> &number, vector<vector<unsigned short>> &c
 
     long long unsigned int numsize = number.size();
 
-    for (unsigned int i = 0; i <= ((temp-numsize));i++)
+    for (unsigned int i = 0; i <= ((temp-numsize)+2);i++)
     {
         number.emplace_back(0);
     }
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 8; i++)
     {
-        for ( unsigned int j = 0; j < counters.at(i).size(); j++)
+        for (unsigned int j = 0; j < counters.at(i).size(); j++)
         {
             number.at(j) += counters.at(i).at(j);
         }
@@ -68,10 +69,9 @@ void finalize (vector<unsigned short> &number, vector<vector<unsigned short>> &c
 
     for (unsigned int i = 0; i < number.size(); i++)
     {
-        while (number.at(i) > 9)
+        if (number.at(i) > 9)
         {
-            number.at(i) -= 10;
-            number.at(i+1)++;
+            correct(number, i);
         }
     }
 }

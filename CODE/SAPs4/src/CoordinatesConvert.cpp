@@ -12,10 +12,10 @@ int translateXtoMachine(int X)
 
 int translateYtoMan(int Y, int height)
 {
-    return Y-(height/2)-1;
+    return height-Y-((height)/2)-1;
 }
 
 int translateYtoMachine(int Y, int height)
 {
-    return Y+(height/2);
+    return (height/2)-Y;
 }
