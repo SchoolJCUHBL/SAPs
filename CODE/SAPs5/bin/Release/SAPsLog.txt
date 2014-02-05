@@ -1,4 +1,0 @@
-start IT
-result: 124 
-
-start IT
