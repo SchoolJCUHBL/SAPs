@@ -1,7 +1,7 @@
 SAPs
 ====
 
-Self Avoiding Polygons
+Self Avoiding Polygons searcher
 
 A program written by Martijn Wilhelm, Robin Persoons & Victor van Lange
 
