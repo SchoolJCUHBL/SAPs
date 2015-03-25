@@ -181,32 +181,13 @@ int checkInput()
     return n;
 }
 
-void WorkerFunc(bool host, int n)
+void WorkerFunc()
 {
     mpz_class counter;
     Parameters recvparm;
-    if (host)
+    while (q.try_dequeue_from_producer(ptok, recvparm))
     {
-        int i=0;
-        if (n==0)
-        {
-            n=1;
-        }
-        while (q.try_dequeue_from_producer(ptok, recvparm))
-        {
-            TakeStep(recvparm.grid,counter,recvparm.startrow,recvparm.length,recvparm.row,recvparm.col,recvparm.remaining);
-            if (++i%5==0)
-            {
-                std::cout << q.size_approx() << "/" << n << " " << (1-(q.size_approx()/n))*100 << "%" << std::endl;
-            }
-        }
-    }
-    else
-    {
-        while (q.try_dequeue_from_producer(ptok, recvparm))
-        {
-            TakeStep(recvparm.grid,counter,recvparm.startrow,recvparm.length,recvparm.row,recvparm.col,recvparm.remaining);
-        }
+        TakeStep(recvparm.grid,counter,recvparm.startrow,recvparm.length,recvparm.row,recvparm.col,recvparm.remaining);
     }
     IncreaseCCC(counter);
 }
@@ -304,8 +285,6 @@ int main(int argc,char *argv[])
             std::cout << "Starting Consumer Threads..."<<std::endl;
         }
 
-        unsigned int queuedepth = q.size_approx();
-
         unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
         unsigned concurentThreadsUsed = 0;
         switch(concurentThreadsSupported)
@@ -338,7 +317,7 @@ int main(int argc,char *argv[])
             {
                 std::cout << "Thread " << i+1 << "/" << concurentThreadsUsed << "spawned" <<std::endl;
             }
-            threads.emplace_back(std::thread(WorkerFunc,false,0));
+            threads.emplace_back(std::thread(WorkerFunc));
         }
 
         if (!quiet)
@@ -347,7 +326,7 @@ int main(int argc,char *argv[])
             std::cout << "Waiting for Threads to Finish...";
         }
 
-        WorkerFunc(true, queuedepth);
+        WorkerFunc();
 
         for(auto& thread : threads)
         {
