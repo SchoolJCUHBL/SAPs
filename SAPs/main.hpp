@@ -36,5 +36,5 @@ mpz_class ReadCCC();                //Thread-safe read from the total counter, n
 
 int checkInput();                       //check if the given input meets the requirements of >4 and an even number
 void WorkerFunc();                      //Retrieves jobs from queue en proceeds calculating them with TakeStep
-void HostWorkerFunc(unsigned int n);
+void HostWorkerFunc(unsigned int n, bool quiet, int d);
 int main(int argc,char *argv[]);        //Main function. Variables are initialized and all parts of the code are managed.

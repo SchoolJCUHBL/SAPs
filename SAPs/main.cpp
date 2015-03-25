@@ -192,19 +192,21 @@ void WorkerFunc()
     IncreaseCCC(counter);
 }
 
-void HostWorkerFunc(unsigned int n)
+void HostWorkerFunc(unsigned int n, bool quiet, int d)
 {
     mpz_class counter;
     Parameters recvparm;
     int i=0;
+
     if (n==0)
     {
         n=1;
     }
+
     while (q.try_dequeue_from_producer(ptok, recvparm))
     {
         TakeStep(recvparm.grid,counter,recvparm.startrow,recvparm.length,recvparm.row,recvparm.col,recvparm.remaining);
-        if (++i%5==0)
+        if (++i%d==0 && !quiet)
         {
             std::cout << q.size_approx() << "/" << n << " " << (1.0-((float)q.size_approx()/(float)n))*100.0 << "%" << std::endl;
         }
@@ -216,7 +218,9 @@ int main(int argc,char *argv[])
 {
     int SAPlength = 0;
     bool quiet = false;
+    bool superquiet = false;
     int depth=7;
+    int ReportRate = 30;
     std::ofstream outputFile;
     outputFile.open("SAPsLog.csv", std::ios::out | std::ios::app);
 
@@ -248,11 +252,15 @@ int main(int argc,char *argv[])
                 {
                     quiet=true;
                 }
+                if (arg2=="-qq")
+                {
+                    superquiet=true;
+                }
             }
 
         }
 
-        if (!quiet)
+        if (!quiet && !superquiet)
         {
             std::cout << "Initializing startup variables" << std::endl;
         }
@@ -272,18 +280,27 @@ int main(int argc,char *argv[])
             startrow=(SAPlength-6)/2+1;
         }
 
+        if (SAPlength>=28)
+        {
+            ReportRate = 15;
+        }
+        if (SAPlength>=34)
+        {
+            ReportRate = 5;
+        }
+
         std::vector<std::thread> threads;
         mpz_class counter;
 
         //initialize grid and set primary off-limits fields
-        if (!quiet)
+        if (!quiet && !superquiet)
         {
             std::cout <<width << "x" << height << " Grid initializing...";
         }
         std::vector< std::vector< bool > > grid ( height, std::vector<bool> ( width, 0 ) );
 
         initForbidden(grid,SAPlength);
-        if (!quiet)
+        if (!quiet && !superquiet)
         {
             std::cout << "  Complete"<< std::endl;
             printVector(grid);
@@ -299,7 +316,7 @@ int main(int argc,char *argv[])
 
         IncreaseCCC(counter);
 
-        if (!quiet)
+        if (!quiet && !superquiet)
         {
             std::cout << "  Complete"<< std::endl;
             std::cout << "Approximately " << q.size_approx() << " items in queue" <<std::endl;
@@ -310,53 +327,57 @@ int main(int argc,char *argv[])
 
         unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
         unsigned concurentThreadsUsed = 0;
-        switch(concurentThreadsSupported)
-        {
-            case 0:
-                if (!quiet)
-                {
-                    std::cout << "Request for amount of threads failed, spawning 0 additional threads for safety" <<std::endl;
-                }
-                break;
-            case 1:
-                if (!quiet)
-                {
-                    std::cout << "This Machine reports: 1 available thread, 0 additional threads will be spawned" <<std::endl;
-                }
-                break;
-            default:
-                concurentThreadsUsed = concurentThreadsSupported-1;
-                if (!quiet)
-                {
-                    std::cout << "This Machine reports: "<< concurentThreadsSupported << " available threads." <<std::endl;
-                    std::cout << concurentThreadsUsed << " additional Threads will be spawned (main thread will also occupy one thread)." <<std::endl;
-                }
-        }
 
-
-        for (unsigned int i = 0; i<concurentThreadsUsed; ++i)
+        if (queueSize > 2512)
         {
-            if (!quiet)
+            switch(concurentThreadsSupported)
             {
-                std::cout << "Thread " << i+1 << "/" << concurentThreadsUsed << "spawned" <<std::endl;
+                case 0:
+                    if (!quiet && !superquiet)
+                    {
+                        std::cout << "Request for amount of threads failed, spawning 0 additional threads for safety" <<std::endl;
+                    }
+                    break;
+                case 1:
+                    if (!quiet && !superquiet)
+                    {
+                        std::cout << "This Machine reports: 1 available thread, 0 additional threads will be spawned" <<std::endl;
+                    }
+                    break;
+                default:
+                    concurentThreadsUsed = concurentThreadsSupported-1;
+                    if (!quiet && !superquiet)
+                    {
+                        std::cout << "This Machine reports: "<< concurentThreadsSupported << " available threads." <<std::endl;
+                        std::cout << concurentThreadsUsed << " additional Threads will be spawned (main thread will also occupy one thread)." <<std::endl;
+                    }
             }
-            threads.emplace_back(std::thread(WorkerFunc));
+
+
+            for (unsigned int i = 0; i<concurentThreadsUsed; ++i)
+            {
+                if (!quiet && !superquiet)
+                {
+                    std::cout << "Thread " << i+1 << "/" << concurentThreadsUsed << "spawned" <<std::endl;
+                }
+                threads.emplace_back(std::thread(WorkerFunc));
+            }
+
+            if (!quiet && !superquiet)
+            {
+                std::cout << "  Complete"<<std::endl;
+                std::cout << "Waiting for Threads to Finish..." << std::endl;
+            }
         }
 
-        if (!quiet)
-        {
-            std::cout << "  Complete"<<std::endl;
-            std::cout << "Waiting for Threads to Finish..." << std::endl;
-        }
-
-        HostWorkerFunc(queueSize);
+        HostWorkerFunc(queueSize, superquiet, ReportRate);
 
         for(auto& thread : threads)
         {
             thread.join();
         }
 
-        if (!quiet)
+        if (!quiet && !superquiet)
         {
             std::cout << "Finished!" << std::endl << "Total Correct Paths: ";
         }
@@ -364,7 +385,7 @@ int main(int argc,char *argv[])
         std::cout << ReadCCC() << std::endl;
         outputFile << SAPlength << ";" << ReadCCC() << std::endl;
         //end program successfully
-        if (!quiet)
+        if (!quiet && !superquiet)
         {
             std::cout << "Program finished"<< std::endl;
         }
