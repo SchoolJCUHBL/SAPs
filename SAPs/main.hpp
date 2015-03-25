@@ -28,7 +28,7 @@ class Parameters
 void printVector(std::vector<std::vector<bool> > &grid);                                  //print the vector to the screen for debugging purposes
 void initForbidden(std::vector<std::vector<bool>> &grid, const unsigned int length);      //set primary off-limits fields
 
-void ProduceStep(std::vector<std::vector<bool>> &grid, mpz_class &counter, const int &startrow, const int &length, int row, int col, int remaining);    //Produce queue jobs
+void ProduceStep(std::vector<std::vector<bool>> &grid, mpz_class &counter, const int &startrow, const int &length, int row, int col, int remaining, int &depth);    //Produce queue jobs
 void TakeStep(std::vector<std::vector<bool>> &grid, mpz_class &counter, const int &startrow, const int &length, int row, int col, int remaining);       //General walking function
 
 void IncreaseCCC(mpz_class &Incr);  //Thread-safe increase of the total counter
@@ -36,4 +36,5 @@ mpz_class ReadCCC();                //Thread-safe read from the total counter, n
 
 int checkInput();                       //check if the given input meets the requirements of >4 and an even number
 void WorkerFunc();                      //Retrieves jobs from queue en proceeds calculating them with TakeStep
+void HostWorkerFunc(unsigned int n);
 int main(int argc,char *argv[]);        //Main function. Variables are initialized and all parts of the code are managed.

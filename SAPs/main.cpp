@@ -63,7 +63,7 @@ void initForbidden(std::vector<std::vector<bool>> &grid, const unsigned int leng
     }
 }
 
-void ProduceStep(std::vector<std::vector<bool>> &grid, mpz_class &counter, const int &startrow, const int &length, int row, int col, int remaining)
+void ProduceStep(std::vector<std::vector<bool>> &grid, mpz_class &counter, const int &startrow, const int &length, int row, int col, int remaining, int &depth)
 {
     if (!grid.at(row).at(col))
     {
@@ -79,12 +79,12 @@ void ProduceStep(std::vector<std::vector<bool>> &grid, mpz_class &counter, const
                 else
                 {
                     grid.at(row).at(col)=true;
-                    if (remaining>=length-5)
+                    if (remaining>=length-depth)
                     {
-                        ProduceStep(grid,counter,startrow,length,row,col+1,remaining-1);
-                        ProduceStep(grid,counter,startrow,length,row+1,col,remaining-1);
-                        ProduceStep(grid,counter,startrow,length,row,col-1,remaining-1);
-                        ProduceStep(grid,counter,startrow,length,row-1,col,remaining-1);
+                        ProduceStep(grid,counter,startrow,length,row,col+1,remaining-1,depth);
+                        ProduceStep(grid,counter,startrow,length,row+1,col,remaining-1,depth);
+                        ProduceStep(grid,counter,startrow,length,row,col-1,remaining-1,depth);
+                        ProduceStep(grid,counter,startrow,length,row-1,col,remaining-1,depth);
                     }
                     else
                     {
@@ -192,10 +192,31 @@ void WorkerFunc()
     IncreaseCCC(counter);
 }
 
+void HostWorkerFunc(unsigned int n)
+{
+    mpz_class counter;
+    Parameters recvparm;
+    int i=0;
+    if (n==0)
+    {
+        n=1;
+    }
+    while (q.try_dequeue_from_producer(ptok, recvparm))
+    {
+        TakeStep(recvparm.grid,counter,recvparm.startrow,recvparm.length,recvparm.row,recvparm.col,recvparm.remaining);
+        if (++i%5==0)
+        {
+            std::cout << q.size_approx() << "/" << n << " " << (1.0-((float)q.size_approx()/(float)n))*100.0 << "%" << std::endl;
+        }
+    }
+    IncreaseCCC(counter);
+}
+
 int main(int argc,char *argv[])
 {
     int SAPlength = 0;
     bool quiet = false;
+    int depth=7;
     std::ofstream outputFile;
     outputFile.open("SAPsLog.csv", std::ios::out | std::ios::app);
 
@@ -274,7 +295,7 @@ int main(int argc,char *argv[])
         //Set first field to forbidden and force first step to right
         grid.at(startrow).at(1)=true;
 
-        ProduceStep(grid,counter,startrow,SAPlength,startrow,2,SAPlength-1);
+        ProduceStep(grid,counter,startrow,SAPlength,startrow,2,SAPlength-1,depth);
 
         IncreaseCCC(counter);
 
@@ -284,6 +305,8 @@ int main(int argc,char *argv[])
             std::cout << "Approximately " << q.size_approx() << " items in queue" <<std::endl;
             std::cout << "Starting Consumer Threads..."<<std::endl;
         }
+
+        unsigned int queueSize = q.size_approx();
 
         unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
         unsigned concurentThreadsUsed = 0;
@@ -323,10 +346,10 @@ int main(int argc,char *argv[])
         if (!quiet)
         {
             std::cout << "  Complete"<<std::endl;
-            std::cout << "Waiting for Threads to Finish...";
+            std::cout << "Waiting for Threads to Finish..." << std::endl;
         }
 
-        WorkerFunc();
+        HostWorkerFunc(queueSize);
 
         for(auto& thread : threads)
         {
@@ -335,7 +358,7 @@ int main(int argc,char *argv[])
 
         if (!quiet)
         {
-            std::cout << "  Finished!" << std::endl << "Total Correct Paths: ";
+            std::cout << "Finished!" << std::endl << "Total Correct Paths: ";
         }
 
         std::cout << ReadCCC() << std::endl;

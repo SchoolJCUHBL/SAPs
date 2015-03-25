@@ -38,3 +38,32 @@
 	<thread>
 	"internal/concurrentqueue_internal_debug.h"
 
+1427324946 source:c:\users\s132378\documents\github\saps\saps\main.cpp
+	"main.hpp"
+
+1427324685 c:\users\s132378\documents\github\saps\saps\main.hpp
+	<cmath>
+	<fstream>
+	<iostream>
+	<mutex>
+	<sstream>
+	<string>
+	<thread>
+	<vector>
+	"concurrentqueue.hpp"
+	<gmpxx.h>
+
+1427302251 c:\users\s132378\documents\github\saps\saps\include\concurrentqueue.hpp
+	<atomic>
+	<cstdint>
+	<cstdlib>
+	<type_traits>
+	<algorithm>
+	<utility>
+	<limits>
+	<climits>
+	<cassert>
+	<array>
+	<thread>
+	"internal/concurrentqueue_internal_debug.h"
+
