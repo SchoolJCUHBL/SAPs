@@ -4,6 +4,8 @@ std::mutex tex;
 mpz_class CCCounter;
 moodycamel::ConcurrentQueue<Parameters> q;
 moodycamel::ProducerToken ptok(q);
+std::condition_variable cv;
+std::mutex cv_m;
 
 void printVector(std::vector<std::vector<bool> > &grid)
 {
@@ -192,6 +194,15 @@ void WorkerFunc()
     IncreaseCCC(counter);
 }
 
+void CheckProgression(int n)
+{
+    std::unique_lock<std::mutex> lk(cv_m);
+    while(!std::cv.wait_for(lk, std::chrono::minutes(5),[]{return true}))
+    {
+        std::cout << q.size_approx() << "/" << n << (1-(q.size_approx()/n))*100 << "%" << std::endl;
+    }
+}
+
 int main(int argc,char *argv[])
 {
     int SAPlength = 0;
@@ -285,6 +296,8 @@ int main(int argc,char *argv[])
             std::cout << "Starting Consumer Threads..."<<std::endl;
         }
 
+        int initqueue = q.size_approx();
+
         unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
         unsigned concurentThreadsUsed = 0;
         switch(concurentThreadsSupported)
@@ -310,7 +323,6 @@ int main(int argc,char *argv[])
                 }
         }
 
-
         for (unsigned int i = 0; i<concurentThreadsUsed; ++i)
         {
             if (!quiet)
@@ -326,12 +338,16 @@ int main(int argc,char *argv[])
             std::cout << "Waiting for Threads to Finish...";
         }
 
+        std::thread chkprg(CheckProgression, initqueue);
+
         WorkerFunc();
 
         for(auto& thread : threads)
         {
             thread.join();
         }
+
+        chkprg.join();
 
         if (!quiet)
         {

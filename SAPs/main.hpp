@@ -7,6 +7,8 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <condition_variable>
+#include <chrono>
 
 //external libraries
 #include "concurrentqueue.hpp"  //lockfree queue
@@ -36,4 +38,5 @@ mpz_class ReadCCC();                //Thread-safe read from the total counter, n
 
 int checkInput();                       //check if the given input meets the requirements of >4 and an even number
 void WorkerFunc();                      //Retrieves jobs from queue en proceeds calculating them with TakeStep
+void CheckProgression(int n);                //Check how many jobs are approximately still in the pipeline
 int main(int argc,char *argv[]);        //Main function. Variables are initialized and all parts of the code are managed.
